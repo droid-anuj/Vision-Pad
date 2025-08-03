@@ -1,6 +1,6 @@
 # VisionPad - Collaborative Visual Canvas
 
-[Live URL](https://vision-pad-nine.vercel.app/)
+[Live URL](https://vision-pad-83a.vercel.app/)
 
 VisionPad is a real-time collaborative whiteboard tool built with Next.js, Liveblocks, Convex, and Clerk. It allows multiple users to draw, create shapes, and leave notes collaboratively.
 
