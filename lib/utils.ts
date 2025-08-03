@@ -1,4 +1,4 @@
-import { Camera, Color, Point, Side, XYWH } from "@/types/canvas";
+import { Camera, Color, Layer, LayerType, PathLayer, Point, Side, XYWH } from "@/types/canvas";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -70,3 +70,97 @@ export function resizeBounds(bounds:XYWH,corner:Side, point:Point):XYWH{
 
   return result;
 }
+
+export function findIntersectionLayersWithRectangle(
+  layerIds: readonly string[],
+  layers: ReadonlyMap<string, Layer>,
+  a: Point,
+  b: Point
+): string[] {
+  const rect = {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    width: Math.abs(a.x - b.x),
+    height: Math.abs(a.y - b.y),
+  };
+
+  const intersectingLayers: string[] = [];
+
+  for (const id of layerIds) {
+    const layer = layers.get(id);
+    if (!layer) continue;
+
+    const lx = layer.x;
+    const ly = layer.y;
+    const lw = layer.width;
+    const lh = layer.height;
+
+    const isIntersecting =
+      rect.x < lx + lw &&
+      rect.x + rect.width > lx &&
+      rect.y < ly + lh &&
+      rect.y + rect.height > ly;
+
+    if (isIntersecting) {
+      intersectingLayers.push(id);
+    }
+  }
+
+  return intersectingLayers;
+}
+
+export function getContrastingTextColor(color: Color) {
+  const { r, g, b } = color;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  return luminance > 0.5 ? "black" : "white";
+}
+
+export function penPointsToPathLayer(
+  points: number[][],
+  color: Color
+): PathLayer {
+  if (points.length < 2) {
+    throw new Error("Cannot transform with less than 2 points");
+  }
+
+  let left = Number.POSITIVE_INFINITY;
+  let top = Number.POSITIVE_INFINITY;
+  let right = Number.NEGATIVE_INFINITY;
+  let bottom = Number.NEGATIVE_INFINITY;
+
+  for (const point of points) {
+    const [x, y] = point;
+    left = Math.min(left, x);
+    top = Math.min(top, y);
+    right = Math.max(right, x);
+    bottom = Math.max(bottom, y);
+  }
+
+  return {
+    type: LayerType.Path,
+    x: left,
+    y: top,
+    width: right - left,
+    height: bottom - top,
+    fill: color,
+    points:points.map(([x,y,pressure])=>[x-left,y-top,pressure])
+  };
+};
+
+
+export function getSvgPathFromStroke(stroke: number[][]) {
+  if (!stroke.length) return "";
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length];
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+      return acc;
+    },
+    ["M", ...stroke[0], "Q"]
+  );
+
+  d.push("Z");
+  return d.join(" ");
+};

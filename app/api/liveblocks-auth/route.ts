@@ -8,7 +8,7 @@ import { api } from "@/convex/_generated/api";
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const liveblocks = new Liveblocks({
-  secret: "sk_prod_lNTQFXAelCzFK1GF_P6uj5Xprd7tKl4PH3ssl1GMwTq_1sdRrKjjnh-8Rf94MD72",
+  secret: process.env.LIVEBLOCKS_SECRET_KEY!,
 });
 
 export async function POST(request: Request) {

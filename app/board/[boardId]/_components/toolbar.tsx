@@ -46,7 +46,7 @@ const Toolbar = (
                     })} isActive={canvasState.mode===CanvasMode.Inserting && canvasState.LayerType === LayerType.Ellipse}/>
                 <ToolButton label="Pen" icon={Pencil} onClick={()=>setCanvasState({
                     mode:CanvasMode.Pencil,
-                    })} isActive={canvasState.mode===CanvasMode.Pencil}/>
+                    })} isActive={canvasState.mode===CanvasMode.Pencil} />
                 
             </div>
             <div className="bg-white rounded-md p-1.5 flex gap-y-1 flex-col items-center shadow-md">
